@@ -4,8 +4,10 @@
 #include <vector.h>
 
 #define MAXLEN 25
+#define FILE_ERROR "ERROR: reading file\n"
 
 vector tokens;
+int err_status = 0;
 
 int is_valid_char(char c) {
     if(c < 48 || c > 122) return 0;
@@ -21,10 +23,13 @@ void print_tokens() {
     }
 }
 
-int main(int argc, char** argv) {
-    if(argc != 2) return 1;
+void parse_tokens(char* file_name) {
+    FILE* fp = fopen(file_name, "r");
+    if(!fp) {
+        err_status = 1;
+        return;
+    }
 
-    FILE* fp = fopen(argv[1], "r");
     char buff[MAXLEN] = {0};
 
     tokens = init_vector(MAXLEN);
@@ -44,6 +49,17 @@ int main(int argc, char** argv) {
         }
         i++;
     }
+}
+
+int main(int argc, char** argv) {
+    if(argc != 2) exit(1);
+
+    parse_tokens(argv[1]);
+
+    if(err_status) {
+        perror(FILE_ERROR);   
+        exit(2);
+    } 
 
     print_tokens();
     free_vector(&tokens);
