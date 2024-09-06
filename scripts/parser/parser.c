@@ -5,8 +5,10 @@
 
 #define MAXLEN 25
 #define FILE_ERROR "ERROR: reading file\n"
+#define TYPEDEF_LEN 7
 
 vector tokens;
+vector structs;
 int err_status = 0;
 
 int is_valid_char(char c) {
@@ -20,6 +22,12 @@ int is_valid_char(char c) {
 void print_tokens() {
     for(int i = 0; i < tokens.size; i++) {
         printf("token %d: %s\n", i, (char *)tokens.arr[i]);
+    }
+}
+
+void print_structs() {
+    for(int i = 0; i < structs.size; i++) {
+        printf("struct %d: %s\n", i, (char *)structs.arr[i]);
     }
 }
 
@@ -51,10 +59,24 @@ void parse_tokens(char* file_name) {
     }
 }
 
+void find_structs() {
+    structs = init_vector(5);
+    for(int i = 0; i < tokens.size; i++) {
+        char* str = (char *)tokens.arr[i];
+        if(!strncmp(str, "typedef", TYPEDEF_LEN)) {
+            char* allocator = MY_ALLOC(strnlen(str, MAXLEN) + 1); // excludes '\0'
+            strncpy(allocator, str, MAXLEN); 
+            vector_add(&structs, allocator);
+        }
+    }
+}
+
 int main(int argc, char** argv) {
     if(argc != 2) exit(1);
 
     parse_tokens(argv[1]);
+    find_structs();
+
 
     if(err_status) {
         perror(FILE_ERROR);   
@@ -62,6 +84,8 @@ int main(int argc, char** argv) {
     } 
 
     print_tokens();
+    print_structs();
     free_vector(&tokens);
+    free_vector(&structs);
     return 0;
 }
