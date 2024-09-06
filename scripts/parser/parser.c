@@ -12,6 +12,7 @@ vector structs;
 int err_status = 0;
 
 int is_valid_char(char c) {
+    if(c == '{' || c == '}') return 1;
     if(c < 48 || c > 122) return 0;
     if(c >= 58 && c <= 64) return 0;
     if(c >= 91 && c <= 94) return 0;
@@ -59,13 +60,28 @@ void parse_tokens(char* file_name) {
     }
 }
 
+int find_closing_bracket(int idx) {
+    int count = 0;
+    char* str = (char *)tokens.arr[idx];
+    while(idx < tokens.size && !strncmp(str, "}", 1)) {
+        count++;
+        idx++;
+    }
+    printf("found at offset: %d\n", count);
+    return count;
+}
+
 void find_structs() {
     structs = init_vector(5);
     for(int i = 0; i < tokens.size; i++) {
         char* str = (char *)tokens.arr[i];
         if(!strncmp(str, "typedef", TYPEDEF_LEN)) {
+            char* struct_name = (char *)tokens.arr[i+2];
+            if(!strncmp(struct_name, "{", 0)) {
+                struct_name = (char *)tokens.arr[i+find_closing_bracket(i) + 1];
+            }
             char* allocator = MY_ALLOC(strnlen(str, MAXLEN) + 1); // excludes '\0'
-            strncpy(allocator, str, MAXLEN); 
+            strncpy(allocator, tokens.arr[i+2], MAXLEN); 
             vector_add(&structs, allocator);
         }
     }
@@ -83,9 +99,9 @@ int main(int argc, char** argv) {
         exit(2);
     } 
 
-    print_tokens();
     print_structs();
-    free_vector(&tokens);
+    print_tokens();
     free_vector(&structs);
+    free_vector(&tokens);
     return 0;
 }
