@@ -21,6 +21,10 @@ void add_to_vim_file() {
         fwrite(text_to_write, 1, strnlen(text_to_write, 2*MAXLEN), vim_fp);
         free(text_to_write);
     }
+
+    // TODO: fix sizes
+    char linking_text[] = "highlight link cType Type";
+    fwrite(linking_text, 1, strnlen(linking_text, 2*MAXLEN), vim_fp);
 }
 
 int is_valid_char(char c) {
