@@ -11,6 +11,18 @@ vector tokens;
 vector structs;
 int err_status = 0;
 
+void add_to_vim_file() {
+    char* filename = "test_file.vim";
+    FILE* vim_fp = fopen(filename, "w");
+
+    for(int i = 0; i < structs.size; i++) {
+        char* text_to_write = MY_ALLOC(2*MAXLEN);
+        sprintf(text_to_write, "syntax keyword cType %s\n", (char *)structs.arr[i]);
+        fwrite(text_to_write, 1, strnlen(text_to_write, 2*MAXLEN), vim_fp);
+        free(text_to_write);
+    }
+}
+
 int is_valid_char(char c) {
     if(c == '{' || c == '}') return 1;
     if(c < 48 || c > 122) return 0;
@@ -58,6 +70,8 @@ void parse_tokens(char* file_name) {
         }
         i++;
     }
+
+    fclose(fp);
 }
 
 int find_closing_bracket(int idx) {
@@ -77,12 +91,13 @@ void find_structs() {
         char* str = (char *)tokens.arr[i];
         if(!strncmp(str, "typedef", TYPEDEF_LEN)) {
             char* struct_name = (char *)tokens.arr[i+2];
-            if(!strncmp(struct_name, "{", 0)) {
+            /*if(!strncmp(struct_name, "{", 0)) {
                 struct_name = (char *)tokens.arr[i+find_closing_bracket(i) + 1];
-            }
+            }*/
             char* allocator = MY_ALLOC(strnlen(str, MAXLEN) + 1); // excludes '\0'
-            strncpy(allocator, tokens.arr[i+2], MAXLEN); 
+            strncpy(allocator, struct_name, MAXLEN); 
             vector_add(&structs, allocator);
+            add_to_vim_file();
         }
     }
 }
@@ -93,6 +108,7 @@ int main(int argc, char** argv) {
     parse_tokens(argv[1]);
     find_structs();
 
+    free_vector(&tokens);
 
     if(err_status) {
         perror(FILE_ERROR);   
@@ -100,8 +116,6 @@ int main(int argc, char** argv) {
     } 
 
     print_structs();
-    print_tokens();
     free_vector(&structs);
-    free_vector(&tokens);
     return 0;
 }
