@@ -77,7 +77,9 @@ void parse_tokens(char* file_name) {
 int find_closing_bracket(int idx) {
     int count = 0;
     char* str = (char *)tokens.arr[idx];
+    printf("finding } for: %s\n", str);
     while(idx < tokens.size && !strncmp(str, "}", 1)) {
+        str = (char *)tokens.arr[idx+1];
         count++;
         idx++;
     }
@@ -91,9 +93,9 @@ void find_structs() {
         char* str = (char *)tokens.arr[i];
         if(!strncmp(str, "typedef", TYPEDEF_LEN)) {
             char* struct_name = (char *)tokens.arr[i+2];
-            /*if(!strncmp(struct_name, "{", 0)) {
+            if(!strncmp(struct_name, "{", 1)) {
                 struct_name = (char *)tokens.arr[i+find_closing_bracket(i) + 1];
-            }*/
+            }
             char* allocator = MY_ALLOC(strnlen(str, MAXLEN) + 1); // excludes '\0'
             strncpy(allocator, struct_name, MAXLEN); 
             vector_add(&structs, allocator);
