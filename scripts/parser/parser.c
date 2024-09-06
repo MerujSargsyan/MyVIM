@@ -12,8 +12,12 @@ vector structs;
 int err_status = 0;
 
 void add_to_vim_file() {
-    char* filename = "test_file.vim";
+    char* filename = "../../after/syntax/c.vim";
     FILE* vim_fp = fopen(filename, "w");
+    if(!vim_fp) {
+        perror("VIM file not found");
+        exit(3);
+    }
 
     for(int i = 0; i < structs.size; i++) {
         char* text_to_write = MY_ALLOC(2*MAXLEN);
