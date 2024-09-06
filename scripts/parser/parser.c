@@ -77,13 +77,11 @@ void parse_tokens(char* file_name) {
 int find_closing_bracket(int idx) {
     int count = 0;
     char* str = (char *)tokens.arr[idx];
-    printf("finding } for: %s\n", str);
-    while(idx < tokens.size && !strncmp(str, "}", 1)) {
+    while(idx < tokens.size && strncmp(str, "}", 1)) {
         str = (char *)tokens.arr[idx+1];
         count++;
         idx++;
     }
-    printf("found at offset: %d\n", count);
     return count;
 }
 
@@ -95,6 +93,7 @@ void find_structs() {
             char* struct_name = (char *)tokens.arr[i+2];
             if(!strncmp(struct_name, "{", 1)) {
                 struct_name = (char *)tokens.arr[i+find_closing_bracket(i) + 1];
+                struct_name[strnlen(struct_name, MAXLEN)-2] = '\0';
             }
             char* allocator = MY_ALLOC(strnlen(str, MAXLEN) + 1); // excludes '\0'
             strncpy(allocator, struct_name, MAXLEN); 
@@ -117,7 +116,6 @@ int main(int argc, char** argv) {
         exit(2);
     } 
 
-    print_structs();
     free_vector(&structs);
     return 0;
 }
