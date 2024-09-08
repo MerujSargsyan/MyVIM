@@ -7,7 +7,7 @@ set showtabline=2
 set tabstop=4
 set shiftwidth=4
 set expandtab
-set autoindent
+set autoindent 
 set smartindent
 set backspace=indent,eol,start
 
@@ -34,3 +34,8 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 call plug#end()
+
+command! Color call system(expand('~/.vim/scripts/parser/parser') . ' ' . expand('%:p')) | source ~/.vim/after/syntax/c.vim
+command! Test echo expand('~/.vim/scripts/parser/parser') . ' ' . expand('%:p')
+" command! Color call system('./parser ./test_file.c') | source ~/.vim/after/syntax/c.vim
+" command! Color call system('~/.vim/scripts/parsers/parser' . expand('%')) | source ~/.vim/after/syntax/c.vim
